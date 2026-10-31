@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swat Model School | Management System</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <section id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="auth-brand-mark">SMS</div>
+      <p class="auth-eyebrow">SWAT MODEL SCHOOL</p>
+      <h1>Secure School Login</h1>
+      <p class="auth-intro">Apne authorized account se sign in karein.</p>
+      <form id="cloudLoginForm" class="auth-form">
+        <label>Email address<input id="cloudLoginEmail" type="email" autocomplete="username" required placeholder="name@school.com"></label>
+        <label>Password<input id="cloudLoginPassword" type="password" autocomplete="current-password" required placeholder="Your password"></label>
+        <button id="cloudLoginBtn" class="primary-button" type="submit">Sign In</button>
+      </form>
+      <p id="authMessage" class="auth-message" role="status">Secure login powered by Supabase.</p>
+      <small class="auth-footnote">Access is limited to accounts created by the school administrator.</small>
+    </div>
+  </section>
+  <div class="app-shell auth-locked" id="schoolAppShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">SMS</div>
+        <div><strong>Swat Model School</strong><small>Management System</small></div>
+      </div>
+      <div class="campus-label">CURRENT CAMPUS</div>
+      <select id="campusSelect" class="campus-select" aria-label="Select campus">
+        <option value="all">All Campuses</option>
+        <option value="girls">Girls Campus</option>
+        <option value="boys">Boys Campus</option>
+      </select>
+      <nav class="nav-menu">
+        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">▦</span> Dashboard</button>
+        <button class="nav-item" data-page="students"><span class="nav-icon">♙</span> Students <span class="nav-count" id="studentNavCount">0</span></button>
+        <button class="nav-item" data-page="idcards"><span class="nav-icon">▣</span> Student ID Cards</button>
+        <button class="nav-item" data-page="attendance"><span class="nav-icon">✓</span> Attendance</button>
+        <button class="nav-item" data-page="fees"><span class="nav-icon">₨</span> Fees</button>
+        <button class="nav-item" data-page="feeRecovery"><span class="nav-icon">↗</span> Fee Recovery</button>
+        <button class="nav-item" data-page="parentPortal"><span class="nav-icon">✉</span> Parent Communication</button>
+        <button class="nav-item" data-page="noticeBoard"><span class="nav-icon">▣</span> Digital Notice Board</button>
+        <button class="nav-item" data-page="results"><span class="nav-icon">▤</span> Results & DMC</button>
+        <button class="nav-item" data-page="analytics"><span class="nav-icon">▥</span> Performance Analytics</button>
+        <button class="nav-item" data-page="staff"><span class="nav-icon">♧</span> Staff</button>
+        <button class="nav-item" data-page="teacherPerformance"><span class="nav-icon">★</span> Teacher Performance</button>
+        <button class="nav-item" data-page="expenses"><span class="nav-icon">₨</span> Expenses & Finance</button>
+        <button class="nav-item" data-page="inventory"><span class="nav-icon">▦</span> Inventory & Assets</button>
+        <button class="nav-item" data-page="timetable"><span class="nav-icon">▦</span> Timetable</button>
+        <button class="nav-item" data-page="reports"><span class="nav-icon">▥</span> Reports</button>
+        <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span> Settings</button>
+      </nav>
+      <div class="sidebar-footer"><span class="status-dot"></span><div><b>Student cloud pilot</b><small id="studentCloudIndicator" aria-live="polite">Cloud sync status checking…</small></div></div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu" id="mobileMenu" aria-label="Toggle menu">☰</button>
+          <div><div class="eyebrow">SCHOOL ADMINISTRATION</div><h1 id="pageTitle">Dashboard Overview</h1></div>
+        </div>
+        <div class="topbar-right">
+          <div class="today-chip"><span>◷</span> <span id="todayLabel">Today</span></div>
+          <div class="signed-in-user"><span id="signedInRole">Authorized User</span><button type="button" id="cloudLogoutBtn" class="secondary-button">Sign out</button></div>
+          <div class="user-avatar" id="workspaceAvatar">A</div>
+          <div class="user-info"><b id="workspaceName">Administrator</b><small id="workspaceSubtitle">School Office · Local preview</small></div>
+        </div>
+      </header>
+
+      <section class="page-content" id="dashboardPage">
+        <div class="welcome-banner director-banner">
+          <div class="welcome-copy"><span class="welcome-tag">DIRECTOR'S COMMAND CENTER</span><h2>School at a glance, <em>every day.</em></h2><p>Live overview based on records saved in this computer's browser.</p></div>
+          <div class="banner-art"><div class="art-circle circle-one"></div><div class="art-circle circle-two"></div><div class="art-building">⌂</div><div class="art-cap">✦</div></div>
+        </div>
+        <div class="director-toolbar"><div><b id="directorCampusLabel">All Campuses Overview</b><small id="directorUpdatedAt">Updated just now</small></div><button class="secondary-button" id="refreshDirectorDashboard">↻ Refresh Dashboard</button></div>
+        <div class="section-heading"><div><h2>Executive summary</h2><p>Key school indicators for the selected campus.</p></div><span class="date-pill" id="directorMonthLabel">This month</span></div>
+        <div class="director-kpi-grid">
+          <article class="director-kpi kpi-purple"><div class="kpi-icon">♙</div><div class="kpi-label">TOTAL STUDENTS</div><strong id="dirTotalStudents">0</strong><small id="dirStudentSplit">Boys 0 · Girls 0</small></article>
+          <article class="director-kpi kpi-green"><div class="kpi-icon">✓</div><div class="kpi-label">PRESENT TODAY</div><strong id="dirPresentToday">0</strong><small id="dirAttendanceRate">0% of enrolled students</small></article>
+          <article class="director-kpi kpi-orange"><div class="kpi-icon">₨</div><div class="kpi-label">FEE COLLECTION · MONTH</div><strong id="dirFeeCollection">Rs. 0</strong><small id="dirFeePaymentCount">0 payments recorded</small></article>
+          <article class="director-kpi kpi-blue"><div class="kpi-icon">♧</div><div class="kpi-label">ACTIVE STAFF</div><strong id="dirActiveStaff">0</strong><small id="dirStaffSplit">Teaching and non-teaching</small></article>
+          <article class="director-kpi kpi-pink"><div class="kpi-icon">◷</div><div class="kpi-label">PENDING FEE BALANCE</div><strong id="dirFeeDue">Rs. 0</strong><small id="dirFeeDueCount">0 accounts with balance</small></article>
+          <article class="director-kpi kpi-cyan"><div class="kpi-icon">▤</div><div class="kpi-label">MONTHLY NET CASH FLOW</div><strong id="dirNetCash">Rs. 0</strong><small id="dirCashNote">Collections less paid expenses and salaries</small></article>
+        </div>
+        <div class="director-grid-two">
+          <article class="panel director-panel"><div class="panel-heading"><div><h3>Campus comparison</h3><p>Student strength and today's attendance</p></div><span class="readiness-badge">BOYS vs GIRLS</span></div><div id="directorCampusComparison" class="campus-comparison"></div></article>
+          <article class="panel director-panel"><div class="panel-heading"><div><h3>Important alerts</h3><p>Items that may need the director's attention</p></div><span class="panel-more">● LIVE</span></div><div id="directorAlerts" class="director-alert-list"></div></article>
+        </div>
+        <div class="director-grid-two director-lower-grid">
+          <article class="panel director-panel"><div class="panel-heading"><div><h3>Class-wise student strength</h3><p>Enrollment distribution across classes</p></div></div><div id="directorClassStrength" class="class-strength-list"></div></article>
+          <article class="panel director-panel"><div class="panel-heading"><div><h3>Quick access</h3><p>Jump directly to important school work</p></div></div><div class="director-shortcuts">
+            <button data-page="students"><span>＋</span><b>Admissions</b><small>Student register</small></button><button data-page="attendance"><span>✓</span><b>Attendance</b><small>Daily register</small></button><button data-page="fees"><span>₨</span><b>Fee management</b><small>Payments and dues</small></button><button data-page="results"><span>▤</span><b>Examinations</b><small>Results and DMCs</small></button><button data-page="staff"><span>♧</span><b>Staff & payroll</b><small>Employees and salaries</small></button><button data-page="expenses"><span>◈</span><b>Finance</b><small>Expenses and cash flow</small></button>
+          </div></article>
+        </div>
+        <div class="director-footnote"><b>Director dashboard note:</b> Figures are calculated from records currently saved in this browser. This is a local offline dashboard, not yet a live multi-device/cloud portal. Missing records are shown as zero, not estimated.</div>
+      </section>
+
+      <section class="page-content hidden" id="studentsPage">
+        <div class="page-intro"><div><span class="welcome-tag">STUDENT RECORDS</span><h2>Student management</h2><p>Start a basic register for admissions and student details.</p></div><button class="primary-button" id="addStudentBtn">＋ Add student</button></div>
+        <div class="student-summary"><div class="summary-mini"><span class="mini-icon icon-purple">♙</span><div><small>Total students</small><b id="studentCountMini">0</b></div></div><div class="summary-mini"><span class="mini-icon icon-green">⌕</span><div><small>Search records</small><b>Find by name or ID</b></div></div><div class="summary-mini"><span class="mini-icon icon-blue">▦</span><div><small>Selected campus</small><b id="campusSummary">All Campuses</b></div></div></div>
+        <article class="panel table-panel"><div class="table-toolbar"><div><h3>Student register</h3><p>Entries saved in this browser on this computer</p><div class="backup-actions"><button type="button" class="secondary-button" id="exportBackupBtn">Download backup</button><button type="button" class="secondary-button" id="importBackupBtn">Restore backup</button><input type="file" id="importBackupFile" accept="application/json,.json" hidden></div></div><input id="studentSearch" class="search-input" type="text" placeholder="Search name, ID, class..."></div>
+          <div class="table-wrap"><table><thead><tr><th>STUDENT ID</th><th>STUDENT NAME</th><th>CLASS</th><th>CAMPUS</th><th>GUARDIAN</th><th>PHONE</th><th>ACTION</th></tr></thead><tbody id="studentTableBody"></tbody></table></div>
+          <div class="empty-state" id="emptyState"><div class="empty-icon">♙</div><h3>No student records yet</h3><p>Use “Add student” to create your first demo record.</p><button class="secondary-button" id="emptyAddBtn">＋ Add first student</button></div>
+        </article>
+      </section>
+
+      <section class="page-content hidden" id="idcardsPage">
+        <div class="page-intro">
+          <div><span class="welcome-tag">STUDENT IDENTITY CARDS</span><h2>Student ID Card Studio</h2><p>Generate printable school ID cards from student records already saved in the register.</p></div>
+          <div class="idcard-actions"><button class="secondary-button" id="refreshCardsBtn">↻ Refresh preview</button><button class="primary-button" id="printCardsBtn">▣ Print selected cards</button></div>
+        </div>
+        <div class="idcard-info-strip">
+          <div class="idcard-info-icon">✦</div><div><b>Automatic card details</b><p>Student ID, name, class and campus are filled from the Student Management register. Add a photo in the student record in a later enhancement.</p></div>
+        </div>
+        <div class="idcard-toolbar">
+          <div class="idcard-toolbar-left"><label class="select-all-label"><input type="checkbox" id="selectAllCards" checked> Select all visible cards</label><span class="selected-count" id="selectedCardsCount">0 cards selected</span></div>
+          <input id="idCardSearch" class="search-input" type="text" placeholder="Search student name, ID or class...">
+        </div>
+        <div id="idCardGrid" class="idcard-grid"></div>
+        <div id="idCardEmpty" class="empty-state hidden"><div class="empty-icon">▣</div><h3>No students to make cards for</h3><p>Add student records first, then return here to generate their ID cards.</p><button class="secondary-button" data-page="students">Open student register</button></div>
+        <div class="idcard-bottom-note"><b>Printing tip:</b> Select the cards you need and click <b>Print selected cards</b>. In the print window, choose A4 paper and use 100% scale. Test on plain paper before printing on card stock.</div>
+      </section>
+
+      <section class="page-content hidden" id="attendancePage">
+        <div class="page-intro"><div><span class="welcome-tag">DAILY STUDENT RECORD</span><h2>Student Attendance</h2><p>QR scan se daily attendance aur student gate entry/exit manage karein.</p></div><button class="primary-button" id="exportAttendanceBtn">Download attendance CSV</button></div>
+        <div class="attendance-summary">
+          <div class="attendance-stat"><small>PRESENT</small><b id="attPresentCount">0</b></div>
+          <div class="attendance-stat"><small>ABSENT</small><b id="attAbsentCount">0</b></div>
+          <div class="attendance-stat"><small>LEAVE</small><b id="attLeaveCount">0</b></div>
+          <div class="attendance-stat"><small>TOTAL STUDENTS</small><b id="attTotalCount">0</b></div>
+        </div>
+        <div class="attendance-layout">
+          <article class="panel attendance-scan-panel">
+            <div class="panel-heading"><div><h3>Scan student ya teacher/staff QR code</h3><p>Student ya staff ID QR scan karein. Staff QR format: SWAT-MODEL-SCHOOL-STAFF|STAFF-ID.</p></div><span class="readiness-badge">QR ATTENDANCE</span></div>
+            <div id="qrReader" class="qr-reader"><div class="qr-reader-placeholder">▦<span>Camera preview yahan show hoga</span></div></div>
+            <label class="attendance-field">QR action<select id="qrActionMode"><option value="attendance">Mark daily attendance</option><option value="entry">Gate entry (IN)</option><option value="exit">Student gate exit (OUT)</option><option value="staffEntry">Teacher/Staff gate entry (IN)</option><option value="staffExit">Teacher/Staff gate exit (OUT)</option></select></label><div class="attendance-actions"><button class="primary-button" id="startScannerBtn">Start camera scanner</button><button class="secondary-button" id="stopScannerBtn" disabled>Stop camera</button></div>
+            <p class="attendance-help">Camera ke liye internet, camera permission aur localhost/HTTPS zaroori ho sakta hai. Agar camera na chale to neeche manual option use karein.</p>
+            <div class="manual-qr-row"><label>Manual QR text / Student ya Staff ID<input id="manualAttendanceInput" type="text" placeholder="Student ID ya SMS-STAFF-0001 ya staff QR text"></label><button class="secondary-button" id="manualAttendanceBtn">Mark present</button></div>
+            <div id="attendanceScanMessage" class="attendance-message" aria-live="polite">Ready to scan.</div>
+          </article>
+          <article class="panel attendance-manual-panel">
+            <div class="panel-heading"><div><h3>Manual attendance</h3><p>Class register se student select karein.</p></div></div>
+            <label class="attendance-field">Student<select id="attendanceStudentSelect"><option value="">Select student</option></select></label>
+            <label class="attendance-field">Status<select id="attendanceStatusSelect"><option value="present">Present</option><option value="absent">Absent</option><option value="leave">Leave</option></select></label>
+            <button class="primary-button attendance-full-btn" id="saveManualAttendanceBtn">Save attendance</button>
+            <p class="attendance-help">Ek student ki ek date par sirf aik attendance entry hogi. Dobara mark karne par purana status update hoga.</p>
+          </article>
+        </div>
+        <article class="panel attendance-register-panel" style="margin-bottom:18px"><div class="table-toolbar"><div><h3>Student Gate Entry / Exit Log</h3><p>QR scan se aaj ke entry aur exit times record karein.</p></div><span class="readiness-badge">GATE LOG</span></div><div class="attendance-summary"><div class="attendance-stat"><small>GATE ENTRIES</small><b id="gateEntryCount">0</b></div><div class="attendance-stat"><small>GATE EXITS</small><b id="gateExitCount">0</b></div><div class="attendance-stat"><small>STUDENTS INSIDE</small><b id="gateInsideCount">0</b></div><div class="attendance-stat"><small>NO EXIT RECORDED</small><b id="gateNoExitCount">0</b></div></div><div class="table-wrap"><table><thead><tr><th>TIME</th><th>STUDENT</th><th>CLASS</th><th>CAMPUS</th><th>ACTION</th></tr></thead><tbody id="gateLogBody"></tbody></table></div><div class="empty-state" id="gateLogEmpty"><h3>No gate activity yet</h3><p>Gate entry ya exit scan karne par yahan record show hoga.</p></div></article>
+        <article class="panel attendance-register-panel" style="margin-bottom:18px"><div class="table-toolbar"><div><h3>Teacher & Staff Gate Entry / Exit Log</h3><p>Staff QR scan se arrival aur departure time record karein. IN scan staff attendance ko Present mark karta hai.</p></div><span class="readiness-badge"><b id="staffGateLogCount">0</b> RECORDS</span></div><div class="table-wrap"><table><thead><tr><th>TIME</th><th>TEACHER / STAFF</th><th>DESIGNATION</th><th>CAMPUS</th><th>ACTION</th></tr></thead><tbody id="staffGateLogBody"></tbody></table></div><div class="empty-state" id="staffGateLogEmpty"><h3>No teacher/staff gate activity yet</h3><p>Teacher ya staff QR scan karne par yahan record show hoga.</p></div></article>
+        <article class="panel attendance-register-panel">
+          <div class="table-toolbar attendance-toolbar"><div><h3>Daily attendance register</h3><p>Selected date aur campus ka record</p></div><div class="attendance-filters"><label>Date<input type="date" id="attendanceDate"></label><label>Class<select id="attendanceClassFilter"><option value="all">All classes</option><option>Nursery</option><option>Prep</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option></select></label></div></div>
+          <div class="table-wrap"><table><thead><tr><th>STUDENT ID</th><th>STUDENT NAME</th><th>CLASS</th><th>CAMPUS</th><th>STATUS</th><th>TIME</th><th>ACTION</th></tr></thead><tbody id="attendanceTableBody"></tbody></table></div>
+          <div class="empty-state" id="attendanceEmpty"><div class="empty-icon">✓</div><h3>No attendance entries</h3><p>Is date ke liye abhi attendance mark nahi hui.</p></div>
+        </article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Important</b><p>Ye offline prototype attendance isi browser aur computer mein save karta hai. QR code sirf student ko identify karta hai. Online sync, multiple computers aur secure official records ke liye future mein proper database/server setup zaroori hoga.</p></div></div>
+      </section>
+
+      <section class="page-content hidden" id="feesPage">
+        <div class="page-intro"><div><span class="welcome-tag">SCHOOL ACCOUNTS</span><h2>Fee Management</h2><p>Student ki monthly fee, installments, dues aur receipts ka record.</p></div><button class="secondary-button" id="exportFeesBtn">Download fee report CSV</button></div>
+        <div class="fee-summary">
+          <div class="fee-stat"><small>TOTAL FEE CHARGED</small><b id="feeChargedTotal">Rs. 0</b></div>
+          <div class="fee-stat"><small>FEE COLLECTED</small><b id="feeCollectedTotal">Rs. 0</b></div>
+          <div class="fee-stat"><small>OUTSTANDING DUES</small><b id="feeOutstandingTotal">Rs. 0</b></div>
+          <div class="fee-stat"><small>PAYMENTS RECORDED</small><b id="feePaymentCount">0</b></div>
+        </div>
+        <article class="panel fee-entry-panel">
+          <div class="panel-heading"><div><h3>Generate monthly fee / record payment</h3><p>Har student aur month ka aik fee account hoga. Installments isi account mein add hoti rahengi.</p></div><span class="readiness-badge">FEE REGISTER</span></div>
+          <form id="feeForm" class="fee-form">
+            <label>Student *<select id="feeStudent" required><option value="">Select student</option></select></label>
+            <label>Fee month *<input type="month" id="feeMonth" required></label>
+            <label>Monthly tuition fee (Rs.) *<input type="number" id="feeBase" min="0" step="1" required placeholder="e.g. 1500"></label>
+            <label>Transport fee (Rs.)<input type="number" id="feeTransport" min="0" step="1" value="0"></label>
+            <label>Examination fee (Rs.)<input type="number" id="feeExamination" min="0" step="1" value="0"></label>
+            <label>Promotion fee (Rs.)<input type="number" id="feePromotion" min="0" step="1" value="0"></label>
+            <label>Discount (Rs.)<input type="number" id="feeDiscount" min="0" step="1" value="0"></label>
+            <label>Fine / other charges (Rs.)<input type="number" id="feeFine" min="0" step="1" value="0"></label>
+            <label>Payment received now (Rs.) *<input type="number" id="feePayment" min="0" step="1" required value="0"></label>
+            <label>Payment method<select id="feeMethod"><option>Cash</option><option>Bank Transfer</option><option>Easypaisa</option><option>JazzCash</option><option>Other</option></select></label>
+            <label>Payment date<input type="date" id="feePaymentDate" required></label>
+            <div class="fee-calculation"><span>Total fee payable</span><b id="feeNetPreview">Rs. 0</b><small>Paid now enter karne ke baad balance calculate hoga.</small></div>
+            <div class="fee-form-actions"><button type="reset" class="secondary-button" id="resetFeeForm">Clear form</button><button type="submit" class="primary-button">Save fee / payment</button></div>
+          </form>
+          <p class="attendance-help">Agar student ki isi month ki fee pehle se mojood ho, to dobara monthly fee generate nahi hogi; sirf nayi payment add hogi. Fee amounts pehle se saved record se liye jayenge. Transport, examination aur promotion charges bhi isi month ke account mein save honge.</p>
+        </article>
+        <article class="panel fee-register-panel">
+          <div class="table-toolbar"><div><h3>Fee register & payment history</h3><p>Month, campus aur payment status ke mutabiq records filter karein.</p></div><input id="feeSearch" class="search-input" type="text" placeholder="Search student name or ID..."></div>
+          <div class="fee-filters"><label>Month<input type="month" id="feeMonthFilter"></label><label>Status<select id="feeStatusFilter"><option value="all">All statuses</option><option value="paid">Paid</option><option value="partial">Partial</option><option value="unpaid">Unpaid</option></select></label></div>
+          <div class="table-wrap"><table><thead><tr><th>MONTH</th><th>STUDENT / ID</th><th>CLASS / CAMPUS</th><th>NET FEE</th><th>PAID</th><th>BALANCE</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="feeTableBody"></tbody></table></div>
+          <div class="empty-state" id="feeEmpty"><div class="empty-icon">₨</div><h3>No fee records found</h3><p>Student select karke pehli monthly fee entry save karein.</p></div>
+        </article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Important</b><p>Fee data isi browser/computer mein save hota hai. Backup download karte waqt students, attendance aur fee records teeno include honge. Receipt print karne se pehle amounts aur student details verify karein.</p></div></div>
+      </section>
+
+
+      <section class="page-content hidden" id="feeRecoveryPage">
+        <div class="page-intro"><div><span class="welcome-tag">COLLECTION INTELLIGENCE</span><h2>Smart Fee Recovery</h2><p>Existing fee accounts se outstanding dues, recovery progress aur parent reminders.</p></div><div class="idcard-actions"><button class="secondary-button" id="exportFeeRecoveryBtn">Export CSV</button><button class="primary-button" id="printFeeRecoveryBtn">Print Recovery Report</button></div></div>
+        <div class="fee-filters" style="margin-bottom:16px"><label>Fee month<input type="month" id="recoveryMonth"></label><label>Class<select id="recoveryClass"><option value="all">All classes</option><option>Nursery</option><option>Prep</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option></select></label><label>Campus<select id="recoveryCampus"><option value="all">All campuses</option><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option></select></label></div>
+        <div class="fee-summary"><div class="fee-stat"><small>GENERATED FEE DEMAND</small><b id="recoveryDemand">Rs. 0</b></div><div class="fee-stat"><small>AMOUNT RECEIVED</small><b id="recoveryReceived">Rs. 0</b></div><div class="fee-stat"><small>OUTSTANDING DUES</small><b id="recoveryOutstanding">Rs. 0</b></div><div class="fee-stat"><small>RECOVERY RATE</small><b id="recoveryRate">0%</b></div></div>
+        <article class="panel fee-entry-panel"><div class="panel-heading"><div><h3>Monthly recovery progress</h3><p>Collection received compared with fee demand generated for selected filters.</p></div><span class="readiness-badge" id="recoveryProgressLabel">0% recovered</span></div><div style="height:16px;background:#edf0f8;border-radius:20px;overflow:hidden"><div id="recoveryProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#6655df,#21b889);border-radius:20px"></div></div><p class="attendance-help" id="recoveryProgressNote">Fee recovery progress will appear when fee accounts exist.</p></article>
+        <article class="panel fee-register-panel"><div class="table-toolbar"><div><h3>Fee defaulters & follow-up</h3><p>Sirf un students ki list jin ka selected month mein balance baqi hai.</p></div><input id="recoverySearch" class="search-input" placeholder="Search student / ID / guardian"></div><div class="table-wrap"><table><thead><tr><th>STUDENT / ID</th><th>CLASS / CAMPUS</th><th>GUARDIAN / PHONE</th><th>FEE</th><th>PAID</th><th>BALANCE</th><th>STATUS</th><th>REMINDER</th></tr></thead><tbody id="recoveryTableBody"></tbody></table></div><div class="empty-state" id="recoveryEmpty"><div class="empty-icon">✓</div><h3>No outstanding dues</h3><p>Selected month aur filters mein koi pending balance nahi mila.</p></div></article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Important</b><p>Expected demand ka matlab selected month ke liye software mein generate kiye gaye fee accounts ka total hai; jin students ka fee account abhi generate nahi hua, woh is calculation mein shamil nahi. WhatsApp reminder button message prepare karta hai, send karne se pehle aapko WhatsApp mein khud confirm karna hoga.</p></div></div>
+      </section>
+
+      <section class="page-content hidden" id="resultsPage">
+        <div class="page-intro"><div><span class="welcome-tag">ACADEMIC RECORDS</span><h2>Examination & Result Management</h2><p>Exams banayein, subject-wise marks enter karein aur professional A4 DMC print karein.</p></div><button class="secondary-button" id="printMeritBtn">Print Position Holders</button></div>
+        <div class="fee-summary result-summary"><div class="fee-stat"><small>EXAMINATIONS</small><b id="examCount">0</b></div><div class="fee-stat"><small>RESULTS ENTERED</small><b id="resultCount">0</b></div><div class="fee-stat"><small>CLASS TOPPER</small><b id="topperName">—</b></div><div class="fee-stat"><small>TOP PERCENTAGE</small><b id="topperPercent">—</b></div></div>
+        <article class="panel fee-entry-panel"><div class="panel-heading"><div><h3>1. Create examination</h3><p>Exam ka naam, session, class aur subjects define karein.</p></div><span class="readiness-badge">EXAM SETUP</span></div>
+          <form id="examForm" class="fee-form"><label>Examination name *<input id="examName" required placeholder="e.g. First Term Examination"></label><label>Academic session *<input id="examSession" required placeholder="e.g. 2026-2027"></label><label>Class *<select id="examClass" required><option value="">Select class</option><option>Nursery</option><option>Prep</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option></select></label><label>Campus *<select id="examCampus" required><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option></select></label><label>Exam date<input type="date" id="examDate"></label><label>Subjects *<input id="examSubjects" required placeholder="English, Urdu, Mathematics, Science"></label><label>Maximum marks per subject *<input id="examMaxMarks" type="number" min="1" max="1000" value="100" required></label><label>Passing percentage (%) *<input id="examPassingPercent" type="number" min="1" max="100" step="0.5" value="33" required><small>Is exam ke liye minimum overall percentage. Example: 33%</small></label><div class="fee-form-actions"><button class="primary-button" type="submit">Save Examination</button></div></form>
+        </article>
+        <article class="panel fee-entry-panel"><div class="panel-heading"><div><h3>2. Enter student marks</h3><p>Exam select karein, student ke subject-wise marks enter karein aur save karein.</p></div><span class="readiness-badge">MARKS ENTRY</span></div>
+          <div class="fee-form"><label>Select examination *<select id="marksExam"><option value="">Create an examination first</option></select></label><label>Select student *<select id="marksStudent"><option value="">Select student</option></select></label></div><div id="marksInputs" class="marks-inputs"><p class="attendance-help">Pehle examination create karein.</p></div><div class="fee-form-actions"><button class="primary-button" id="saveMarksBtn" type="button">Save Student Marks</button></div>
+        </article>
+        <article class="panel fee-register-panel"><div class="table-toolbar"><div><h3>3. Result register & DMC</h3><p>Saved results dekhein, DMC print karein aur position holders ki merit list banayein.</p></div><input id="resultSearch" class="search-input" placeholder="Search student / exam..."></div><div class="table-wrap"><table><thead><tr><th>EXAM</th><th>STUDENT</th><th>CLASS / CAMPUS</th><th>OBTAINED</th><th>PERCENTAGE</th><th>GRADE</th><th>RESULT</th><th>POSITION</th><th>ACTION</th></tr></thead><tbody id="resultsTableBody"></tbody></table></div><div class="empty-state" id="resultsEmpty"><div class="empty-icon">★</div><h3>No results entered</h3><p>Examination create karke students ke marks enter karein.</p></div></article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Result calculation policy</b><p>Default grading: A1 80%+, A 70%+, B 60%+, C 50%+, D 40%+, F below 40%. Har subject mein 33% se kam marks hon to result Fail hoga. School ki official policy different ho to result publish karne se pehle grades verify karein.</p></div></div>
+      </section>
+
+
+      <section class="page-content hidden" id="noticeBoardPage">
+        <div class="page-intro"><div><span class="welcome-tag">SCHOOL-WIDE ANNOUNCEMENTS</span><h2>Digital Notice Board</h2><p>School notices ko staff, students aur parents ke liye organize aur publish karein.</p></div><button class="secondary-button" id="printNoticeBoardBtn" type="button">Print notice board</button></div>
+        <div class="fee-summary">
+          <div class="fee-stat"><small>TOTAL NOTICES</small><b id="boardTotal">0</b></div>
+          <div class="fee-stat"><small>PUBLISHED</small><b id="boardPublished">0</b></div>
+          <div class="fee-stat"><small>PINNED</small><b id="boardPinned">0</b></div>
+          <div class="fee-stat"><small>EXPIRED</small><b id="boardExpired">0</b></div>
+        </div>
+        <article class="panel fee-entry-panel"><div class="panel-heading"><div><h3>Create notice / announcement</h3><p>Priority, audience aur expiry set karein. Draft ko baad mein publish kar sakte hain.</p></div><span class="readiness-badge">NOTICE BOARD</span></div>
+          <form id="boardNoticeForm" class="fee-form">
+            <label class="span-2">Notice title *<input id="boardTitle" required maxlength="120" placeholder="e.g. Annual examination schedule"></label>
+            <label>Audience<select id="boardAudience"><option value="everyone">Everyone</option><option value="parents">Parents</option><option value="students">Students</option><option value="staff">Staff & teachers</option></select></label>
+            <label>Campus<select id="boardCampus"><option value="all">Both campuses</option><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option></select></label>
+            <label>Priority<select id="boardPriority"><option value="normal">Normal</option><option value="important">Important</option><option value="urgent">Urgent</option></select></label>
+            <label>Publish date *<input id="boardDate" type="date" required></label>
+            <label>Expiry date (optional)<input id="boardExpiry" type="date"></label>
+            <label>Publication status<select id="boardStatus"><option value="published">Publish now</option><option value="draft">Save as draft</option></select></label>
+            <label class="span-2">Announcement *<textarea id="boardMessage" rows="4" required maxlength="2000" placeholder="Write complete notice details..."></textarea></label>
+            <div class="fee-form-actions"><button class="secondary-button" type="reset">Clear</button><button class="primary-button" type="submit">Save notice</button></div>
+          </form>
+        </article>
+        <article class="panel fee-entry-panel"><div class="table-toolbar"><div><h3>Notice register</h3><p>Search, filter, pin, publish or remove notices.</p></div><div class="attendance-filters"><input class="search-input" id="boardSearch" placeholder="Search notices..."><select id="boardFilter"><option value="all">All notices</option><option value="published">Published</option><option value="draft">Drafts</option><option value="active">Active only</option><option value="expired">Expired</option></select></div></div><div id="boardNoticeList" class="parent-notice-list"></div></article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Local notice board</b><p>Notices is computer ke browser mein save hote hain. Ye abhi automatic SMS, push notification, parent login ya cloud publishing nahi karta. Staff/parents tak notice pohanchane ke liye print ya manually share karein.</p></div></div>
+      </section>
+      <section class="page-content hidden" id="teacherPerformancePage">
+        <div class="page-intro"><div><span class="welcome-tag">HUMAN RESOURCES ANALYTICS</span><h2>Teacher Performance & Monitoring</h2><p>Staff attendance, payroll status aur recorded teaching staff details ka monthly overview.</p></div><button class="primary-button" id="exportTeacherPerformance">Export CSV</button></div>
+        <div class="fee-summary">
+          <div class="fee-stat"><small>ACTIVE TEACHERS</small><b id="tpActive">0</b></div>
+          <div class="fee-stat"><small>ATTENDANCE MARKED</small><b id="tpMarked">0</b></div>
+          <div class="fee-stat"><small>PRESENT DAYS</small><b id="tpPresent">0</b></div>
+          <div class="fee-stat"><small>MONTH PAYROLL PAID</small><b id="tpPayroll">Rs. 0</b></div>
+        </div>
+        <article class="panel fee-entry-panel"><div class="table-toolbar"><div><h3>Monthly teacher monitoring</h3><p>Attendance percentage recorded in Staff Daily Attendance. Missing entries are not assumed as absences.</p></div><div class="attendance-filters"><label>Month<input type="month" id="tpMonth"></label><label>Campus<select id="tpCampus"><option value="all">All Campuses</option><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option></select></label></div></div>
+          <div class="table-wrap"><table><thead><tr><th>TEACHER</th><th>DESIGNATION</th><th>CAMPUS</th><th>PRESENT</th><th>ABSENT</th><th>LEAVE</th><th>MARKED DAYS</th><th>PRESENT %</th><th>PAYROLL STATUS</th></tr></thead><tbody id="tpTableBody"></tbody></table></div>
+          <div class="empty-state" id="tpEmpty"><h3>No teaching staff records</h3><p>Staff Management mein Teaching type ke active staff add karein.</p></div>
+        </article>
+        <article class="panel fee-entry-panel"><div class="panel-heading"><div><h3>Performance review notes</h3><p>Director / principal ke liye manual review record. Ye notes staff ke record ko change nahi karte.</p></div></div>
+          <div class="fee-form"><label>Teacher<select id="tpReviewTeacher"><option value="">Select teacher</option></select></label><label>Review month<input type="month" id="tpReviewMonth"></label><label>Review status<select id="tpReviewStatus"><option>Needs Support</option><option>On Track</option><option>Commended</option></select></label><label class="span-2">Review notes<textarea id="tpReviewNote" rows="3" maxlength="500" placeholder="Class preparation, lesson delivery, student support, strengths and improvement areas..."></textarea></label></div>
+          <div class="fee-form-actions"><button type="button" class="primary-button" id="saveTeacherReview">Save Review Note</button></div>
+          <div class="table-wrap"><table><thead><tr><th>MONTH</th><th>TEACHER</th><th>STATUS</th><th>REVIEW NOTES</th><th>ACTION</th></tr></thead><tbody id="tpReviewsBody"></tbody></table></div>
+        </article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Fair-use note</b><p>Attendance percentage sirf entered attendance records par calculate hoti hai; unmarked days ko absent nahi gina jata. Performance review human judgement hai—software automatic teacher ranking ya disciplinary decision nahi karta. Payroll status saved payroll records se liya jata hai.</p></div></div>
+      </section>
+      <section class="page-content hidden" id="staffPage">
+        <div class="page-intro"><div><span class="welcome-tag">HUMAN RESOURCES</span><h2>Staff Management & Payroll</h2><p>Teachers aur non-teaching staff ka record, attendance aur monthly salary manage karein.</p></div></div>
+        <div class="fee-summary">
+          <div class="fee-stat"><small>TOTAL STAFF</small><b id="staffCount">0</b></div>
+          <div class="fee-stat"><small>ACTIVE STAFF</small><b id="activeStaffCount">0</b></div>
+          <div class="fee-stat"><small>MONTHLY PAYROLL</small><b id="monthlyPayrollTotal">Rs. 0</b></div>
+          <div class="fee-stat"><small>SALARY PAID</small><b id="salaryPaidTotal">Rs. 0</b></div>
+        </div>
+        <article class="panel fee-entry-panel">
+          <div class="panel-heading"><div><h3>1. Add / Update Staff Record</h3><p>Staff ki personal aur employment details enter karein.</p></div><span class="readiness-badge">STAFF REGISTER</span></div>
+          <form id="staffForm" class="fee-form">
+            <label>Staff ID<input id="staffId" readonly placeholder="Auto generated"></label>
+            <label>Full Name *<input id="staffName" required maxlength="100" placeholder="Staff full name"></label>
+            <label>Father Name *<input id="staffFather" required maxlength="100" placeholder="Father name"></label>
+            <label>CNIC<input id="staffCnic" maxlength="20" placeholder="XXXXX-XXXXXXX-X"></label>
+            <label>Contact Number *<input id="staffPhone" required maxlength="30" placeholder="03xx-xxxxxxx"></label>
+            <label>Designation *<input id="staffDesignation" required maxlength="80" placeholder="e.g. PST / Head Teacher"></label>
+            <label>Staff Type<select id="staffType"><option>Teaching</option><option>Non-Teaching</option></select></label>
+            <label>Campus<select id="staffCampus"><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option><option value="both">Both Campuses</option></select></label>
+            <label>Qualification<input id="staffQualification" maxlength="100" placeholder="e.g. BA, MA, B.Ed"></label>
+            <label>Joining Date<input id="staffJoining" type="date"></label>
+            <label>Basic Monthly Salary (PKR) *<input id="staffBasic" type="number" min="0" step="1" required placeholder="30000"></label>
+            <label>Employment Status<select id="staffStatus"><option value="Active">Active</option><option value="On Leave">On Leave</option><option value="Resigned">Resigned</option></select></label>
+            <label class="span-2">Address<input id="staffAddress" maxlength="220" placeholder="Village / area"></label>
+            <div class="fee-form-actions"><button type="button" class="secondary-button" id="resetStaffForm">Clear Form</button><button class="primary-button" type="submit">Save Staff Record</button></div>
+          </form>
+        </article>
+        <article class="panel fee-register-panel">
+          <div class="table-toolbar"><div><h3>2. Staff Register</h3><p>Staff search, edit aur delete karein.</p></div><input id="staffSearch" class="search-input" placeholder="Search name / ID / designation..."></div>
+          <div class="table-wrap"><table><thead><tr><th>STAFF ID</th><th>NAME / FATHER</th><th>DESIGNATION</th><th>CAMPUS</th><th>PHONE</th><th>BASIC SALARY</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="staffTableBody"></tbody></table></div>
+          <div class="empty-state" id="staffEmpty"><h3>No staff records yet</h3><p>Upar form se pehla staff member add karein.</p></div>
+        </article>
+        <article class="panel fee-entry-panel">
+          <div class="panel-heading"><div><h3>3. Staff Daily Attendance</h3><p>Staff ki daily Present, Absent ya Leave attendance record karein.</p></div><span class="readiness-badge">ATTENDANCE</span></div>
+          <div class="fee-form">
+            <label>Attendance Date<input type="date" id="staffAttendanceDate"></label>
+            <label>Select Staff<select id="staffAttendancePerson"><option value="">Select staff</option></select></label>
+            <label>Status<select id="staffAttendanceStatus"><option value="Present">Present</option><option value="Absent">Absent</option><option value="Leave">Leave</option></select></label>
+            <label>Note<input id="staffAttendanceNote" placeholder="Optional note"></label>
+          </div>
+          <div class="fee-form-actions"><button class="primary-button" id="saveStaffAttendance" type="button">Save Attendance</button></div>
+          <div class="table-toolbar"><div><h3>Attendance Register</h3><p>Selected date ke staff attendance records.</p></div><span id="staffAttendanceSummary" class="readiness-badge">0 records</span></div>
+          <div class="table-wrap"><table><thead><tr><th>STAFF</th><th>DESIGNATION</th><th>STATUS</th><th>NOTE</th></tr></thead><tbody id="staffAttendanceBody"></tbody></table></div>
+        </article>
+        <article class="panel fee-entry-panel">
+          <div class="panel-heading"><div><h3>4. Monthly Payroll & Salary</h3><p>Basic salary, allowances aur deductions se net salary calculate hogi.</p></div><span class="readiness-badge">PAYROLL</span></div>
+          <form id="payrollForm" class="fee-form">
+            <label>Staff Member *<select id="payrollStaff" required><option value="">Select staff</option></select></label>
+            <label>Salary Month *<input id="payrollMonth" type="month" required></label>
+            <label>Basic Salary (PKR) *<input id="payrollBasic" type="number" min="0" step="1" required></label>
+            <label>Allowances (PKR)<input id="payrollAllowance" type="number" min="0" step="1" value="0"></label>
+            <label>Deductions (PKR)<input id="payrollDeduction" type="number" min="0" step="1" value="0"></label>
+            <label>Payment Date<input id="payrollDate" type="date"></label>
+            <label>Payment Status<select id="payrollStatus"><option value="Unpaid">Unpaid</option><option value="Paid">Paid</option><option value="Partial">Partial</option></select></label>
+            <label>Amount Paid (PKR)<input id="payrollPaid" type="number" min="0" step="1" value="0"></label>
+            <label class="span-2">Remarks<input id="payrollRemarks" maxlength="180" placeholder="Optional salary note"></label>
+            <div class="fee-calculation" id="payrollPreview">Net Salary: Rs. 0</div>
+            <div class="fee-form-actions"><button class="primary-button" type="submit">Save Payroll Record</button></div>
+          </form>
+        </article>
+        <article class="panel fee-register-panel">
+          <div class="table-toolbar"><div><h3>5. Payroll Register</h3><p>Monthly salary history, remaining balance aur printable salary slip.</p></div><input id="payrollMonthFilter" type="month" class="search-input"></div>
+          <div class="table-wrap"><table><thead><tr><th>MONTH</th><th>STAFF</th><th>BASIC</th><th>ALLOWANCES</th><th>DEDUCTIONS</th><th>NET SALARY</th><th>PAID</th><th>BALANCE</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="payrollTableBody"></tbody></table></div>
+          <div class="empty-state" id="payrollEmpty"><h3>No payroll records yet</h3><p>Salary form se monthly payroll add karein.</p></div>
+        </article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Payroll record note</b><p>Salary calculations aur attendance is computer ke browser mein save hoti hain. Payroll record salary register hai; bank, Easypaisa ya JazzCash payment automatically verify nahi hoti. Payment status staff manually update karein aur regular backup download karein.</p></div></div>
+      </section>
+
+
+      <section class="page-content hidden" id="expensesPage">
+        <div class="page-intro"><div><span class="welcome-tag">SCHOOL ACCOUNTS</span><h2>Expenses & Financial Management</h2><p>School ke daily expenses, fee collection aur monthly financial summary manage karein.</p></div><button class="secondary-button" id="exportFinanceBtn">Export Finance CSV</button></div>
+        <div class="fee-filters"><label>Financial Month<input type="month" id="financeMonth"></label><label>Campus<select id="financeCampus"><option value="all">All Campuses</option><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option><option value="both">Shared / Both</option></select></label></div>
+        <div class="fee-summary">
+          <div class="fee-stat"><small>FEE COLLECTION</small><b id="financeIncome">Rs. 0</b></div>
+          <div class="fee-stat"><small>OTHER EXPENSES PAID</small><b id="financeExpenses">Rs. 0</b></div>
+          <div class="fee-stat"><small>SALARY PAID</small><b id="financeSalary">Rs. 0</b></div>
+          <div class="fee-stat"><small>NET CASH FLOW</small><b id="financeNet">Rs. 0</b></div>
+        </div>
+        <article class="panel fee-entry-panel">
+          <div class="panel-heading"><div><h3>1. Record School Expense</h3><p>Bijli, pani, stationery, repair, rent aur doosre school expenses enter karein.</p></div><span class="readiness-badge">EXPENSE ENTRY</span></div>
+          <form id="expenseForm" class="fee-form">
+            <label>Expense Date *<input id="expenseDate" type="date" required></label>
+            <label>Expense Category *<select id="expenseCategory" required><option value="">Select category</option><option>Electricity</option><option>Water</option><option>Gas</option><option>Stationery</option><option>Books & Printing</option><option>Maintenance / Repair</option><option>Cleaning</option><option>Rent</option><option>Furniture & Equipment</option><option>Transport / Fuel</option><option>Events & Activities</option><option>Internet / Phone</option><option>Staff Welfare</option><option>Other</option></select></label>
+            <label>Campus *<select id="expenseCampus"><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option><option value="both">Shared / Both</option></select></label>
+            <label>Amount (PKR) *<input id="expenseAmount" type="number" min="1" step="1" required placeholder="e.g. 5000"></label>
+            <label>Paid To / Vendor<input id="expensePayee" maxlength="100" placeholder="Shop / person name"></label>
+            <label>Payment Method<select id="expenseMethod"><option>Cash</option><option>Bank Transfer</option><option>Easypaisa / JazzCash</option><option>Cheque</option><option>Other</option></select></label>
+            <label>Payment Status<select id="expenseStatus"><option value="Paid">Paid</option><option value="Pending">Pending</option></select></label>
+            <label>Reference / Bill No.<input id="expenseReference" maxlength="60" placeholder="Optional bill number"></label>
+            <label class="span-2">Description / Details *<input id="expenseDescription" required maxlength="180" placeholder="e.g. Electricity bill for October"></label>
+            <div class="fee-form-actions"><button type="button" class="secondary-button" id="resetExpenseForm">Clear Form</button><button type="submit" class="primary-button">Save Expense</button></div>
+          </form>
+        </article>
+        <article class="panel fee-register-panel">
+          <div class="table-toolbar"><div><h3>2. Expense Register</h3><p>Selected month aur campus ke expenses.</p></div><input id="expenseSearch" class="search-input" placeholder="Search category / vendor / detail..."></div>
+          <div class="table-wrap"><table><thead><tr><th>DATE</th><th>CATEGORY / DETAILS</th><th>CAMPUS</th><th>PAID TO</th><th>AMOUNT</th><th>METHOD</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="expenseTableBody"></tbody></table></div>
+          <div class="empty-state" id="expenseEmpty"><h3>No expenses recorded</h3><p>Expense form se school ka pehla kharcha add karein.</p></div>
+        </article>
+        <article class="panel fee-register-panel">
+          <div class="panel-heading"><div><h3>3. Monthly Financial Summary</h3><p>Fee collection, salaries aur expenses ka selected month ka overview.</p></div><span class="readiness-badge">FINANCIAL REPORT</span></div>
+          <div class="table-wrap"><table><thead><tr><th>FINANCIAL ITEM</th><th>AMOUNT (PKR)</th><th>DETAIL</th></tr></thead><tbody id="financeSummaryBody"></tbody></table></div>
+          <p class="attendance-help">Note: Fee collection payment date ke mutabiq count hoti hai. Payroll mein actual paid amount count hota hai. Pending expenses cash flow se subtract nahi hote; woh alag pending liability hain.</p>
+        </article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Accounting record note</b><p>Yeh basic school cash-flow register hai, audited accounting software nahi. Har expense ki receipt/bill sambhal kar rakhein. Data isi computer par save hota hai; regular backup zaroor download karein.</p></div></div>
+      </section>
+
+
+      <section class="page-content hidden" id="inventoryPage">
+        <div class="page-intro"><div><span class="welcome-tag">SCHOOL RESOURCES</span><h2>Inventory & School Assets</h2><p>Stationery, books, furniture, computers aur school property ka stock record maintain karein.</p></div><button class="secondary-button" id="exportInventoryBtn">Export Inventory CSV</button></div>
+        <div class="fee-summary">
+          <div class="fee-stat"><small>STOCK ITEMS</small><b id="inventoryItemCount">0</b></div>
+          <div class="fee-stat"><small>TOTAL STOCK UNITS</small><b id="inventoryUnitCount">0</b></div>
+          <div class="fee-stat"><small>LOW STOCK ALERTS</small><b id="inventoryLowCount">0</b></div>
+          <div class="fee-stat"><small>ASSET RECORDS</small><b id="assetCount">0</b></div>
+        </div>
+        <article class="panel fee-entry-panel">
+          <div class="panel-heading"><div><h3>1. Add Inventory Item / Asset</h3><p>Har item ko unique code dein aur opening stock record karein.</p></div><span class="readiness-badge">ITEM REGISTER</span></div>
+          <form id="inventoryForm" class="fee-form">
+            <label>Item Code<input id="inventoryCode" readonly placeholder="Auto generated"></label>
+            <label>Item Name *<input id="inventoryName" required maxlength="100" placeholder="e.g. Whiteboard Marker"></label>
+            <label>Category *<select id="inventoryCategory" required><option value="">Select category</option><option>Stationery</option><option>Books & Learning</option><option>Furniture</option><option>Computer & IT</option><option>Sports Equipment</option><option>Electrical Equipment</option><option>Cleaning Supplies</option><option>Transport</option><option>Other</option></select></label>
+            <label>Record Type<select id="inventoryType"><option value="Stock">Consumable Stock</option><option value="Asset">Fixed Asset</option></select></label>
+            <label>Campus<select id="inventoryCampus"><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option><option value="both">Shared / Both</option></select></label>
+            <label>Unit *<input id="inventoryUnit" required maxlength="25" placeholder="Pieces / Packs / Reams"></label>
+            <label>Opening Quantity *<input id="inventoryOpening" type="number" min="0" step="0.01" value="0" required></label>
+            <label>Minimum Stock Alert<input id="inventoryMinimum" type="number" min="0" step="0.01" value="0"></label>
+            <label>Unit Cost (PKR)<input id="inventoryCost" type="number" min="0" step="0.01" value="0"></label>
+            <label>Purchase / Asset Date<input id="inventoryDate" type="date"></label>
+            <label class="span-2">Location / Room<input id="inventoryLocation" maxlength="100" placeholder="e.g. Store Room / Class 5"></label>
+            <label class="span-2">Details / Notes<input id="inventoryNotes" maxlength="180" placeholder="Brand, condition, supplier or other notes"></label>
+            <div class="fee-form-actions"><button type="button" class="secondary-button" id="resetInventoryForm">Clear Form</button><button type="submit" class="primary-button">Save Item</button></div>
+          </form>
+        </article>
+        <article class="panel fee-entry-panel">
+          <div class="panel-heading"><div><h3>2. Stock In / Stock Out</h3><p>New purchase ko Stock In aur use/issue ko Stock Out ke zariye record karein.</p></div><span class="readiness-badge">STOCK MOVEMENT</span></div>
+          <form id="stockMovementForm" class="fee-form">
+            <label>Item *<select id="movementItem" required><option value="">Select item</option></select></label>
+            <label>Movement Type<select id="movementType"><option value="IN">Stock In / Purchase</option><option value="OUT">Stock Out / Issued</option></select></label>
+            <label>Quantity *<input id="movementQuantity" type="number" min="0.01" step="0.01" required></label>
+            <label>Date *<input id="movementDate" type="date" required></label>
+            <label>Reference / Bill No.<input id="movementReference" maxlength="60" placeholder="Optional"></label>
+            <label>Issued To / Supplier<input id="movementParty" maxlength="100" placeholder="Teacher / class / vendor"></label>
+            <label class="span-2">Purpose / Note<input id="movementNote" maxlength="180" placeholder="e.g. Stationery issued to Class 4"></label>
+            <div class="fee-form-actions"><button type="submit" class="primary-button">Save Stock Movement</button></div>
+          </form>
+        </article>
+        <article class="panel fee-register-panel">
+          <div class="table-toolbar"><div><h3>3. Current Inventory Register</h3><p>Current quantity, value aur low-stock alerts.</p></div><input id="inventorySearch" class="search-input" placeholder="Search item / code / category..."></div>
+          <div class="table-wrap"><table><thead><tr><th>CODE</th><th>ITEM</th><th>CATEGORY / TYPE</th><th>CAMPUS</th><th>QUANTITY</th><th>MINIMUM</th><th>STOCK VALUE</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="inventoryTableBody"></tbody></table></div>
+          <div class="empty-state" id="inventoryEmpty"><h3>No inventory items</h3><p>Upar form se pehla item add karein.</p></div>
+        </article>
+        <article class="panel fee-register-panel">
+          <div class="table-toolbar"><div><h3>4. Stock Movement History</h3><p>All stock purchases and issues.</p></div><span id="movementCount" class="readiness-badge">0 movements</span></div>
+          <div class="table-wrap"><table><thead><tr><th>DATE</th><th>ITEM</th><th>TYPE</th><th>QUANTITY</th><th>REFERENCE</th><th>PARTY / PURPOSE</th></tr></thead><tbody id="movementTableBody"></tbody></table></div>
+        </article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Inventory note</b><p>Stock value estimated quantity × recorded unit cost se calculate hoti hai. Ye module purchase accounting ya depreciation ledger nahi hai. Stock movements reverse karne ke liye adjustment record workflow abhi available nahi; entry save karne se pehle details verify karein. Data local browser mein save hota hai aur backup mein include hai.</p></div></div>
+      </section>
+
+      <section class="page-content hidden" id="analyticsPage">
+        <div class="page-intro"><div><span class="welcome-tag">ACADEMIC INTELLIGENCE</span><h2>Student Performance Analytics</h2><p>Existing examination marks se class, subject aur student performance ka analysis.</p></div><div class="idcard-actions"><button class="secondary-button" id="exportAnalyticsBtn">Export CSV</button><button class="primary-button" id="printAnalyticsBtn">Print Report</button></div></div>
+        <div class="idcard-toolbar"><div class="idcard-toolbar-left"><label>Class <select id="analyticsClassFilter" class="search-input" style="width:auto"><option value="all">All Classes</option><option>Nursery</option><option>Prep</option><option>KG</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option></select></label><span class="selected-count" id="analyticsCampusLabel">All Campuses</span></div><small id="analyticsExamLabel">Based on saved examination results</small></div>
+        <div class="director-kpi-grid analytics-kpis">
+          <article class="director-kpi kpi-purple"><div class="kpi-icon">▤</div><div class="kpi-label">EXAMINATIONS</div><strong id="anExamCount">0</strong><small>For selected campus / class</small></article>
+          <article class="director-kpi kpi-green"><div class="kpi-icon">♙</div><div class="kpi-label">RESULT ENTRIES</div><strong id="anResultCount">0</strong><small>Marks records available</small></article>
+          <article class="director-kpi kpi-orange"><div class="kpi-icon">％</div><div class="kpi-label">AVERAGE RESULT</div><strong id="anAverage">0%</strong><small>Average percentage</small></article>
+          <article class="director-kpi kpi-blue"><div class="kpi-icon">✓</div><div class="kpi-label">PASS PERCENTAGE</div><strong id="anPassRate">0%</strong><small id="anPassFail">0 pass · 0 fail</small></article>
+        </div>
+        <div class="director-grid-two analytics-grid">
+          <article class="panel director-panel"><div class="panel-heading"><div><h3>Subject-wise performance</h3><p>Average marks percentage in each subject</p></div></div><div id="analyticsSubjects" class="analytics-bars"></div></article>
+          <article class="panel director-panel"><div class="panel-heading"><div><h3>Class-wise performance</h3><p>Average percentage and pass rate</p></div></div><div class="table-wrap"><table><thead><tr><th>CLASS</th><th>ENTRIES</th><th>AVERAGE</th><th>PASS RATE</th></tr></thead><tbody id="analyticsClassBody"></tbody></table></div></article>
+        </div>
+        <div class="director-grid-two analytics-grid">
+          <article class="panel director-panel"><div class="panel-heading"><div><h3>Top 10 students</h3><p>Highest percentages in selected records</p></div></div><div class="table-wrap"><table><thead><tr><th>RANK</th><th>STUDENT</th><th>CLASS</th><th>RESULT</th></tr></thead><tbody id="analyticsTopBody"></tbody></table></div><div class="empty-state" id="analyticsTopEmpty"><p>Result data available nahi.</p></div></article>
+          <article class="panel director-panel"><div class="panel-heading"><div><h3>Students requiring attention</h3><p>Failing or below 40% in recorded exams</p></div></div><div class="table-wrap"><table><thead><tr><th>STUDENT</th><th>CLASS</th><th>RESULT</th><th>STATUS</th></tr></thead><tbody id="analyticsWeakBody"></tbody></table></div><div class="empty-state" id="analyticsWeakEmpty"><p>Is waqt koi weak result entry nahi.</p></div></article>
+        </div>
+        <article class="panel director-panel analytics-progress-panel"><div class="panel-heading"><div><h3>Individual student progress</h3><p>Student ke mukhtalif exams ke percentages ka comparison</p></div><label>Student <select id="analyticsStudentSelect" class="search-input" style="min-width:220px"><option value="">Select student</option></select></label></div><div id="analyticsProgress" class="analytics-progress"></div></article>
+        <article class="panel director-panel analytics-progress-panel"><div class="panel-heading"><div><h3>Attendance vs academic results</h3><p>Attendance records aur exam results ka student-wise overview</p></div></div><div class="table-wrap"><table><thead><tr><th>STUDENT</th><th>CLASS</th><th>ATTENDANCE</th><th>AVERAGE RESULT</th></tr></thead><tbody id="analyticsAttendanceBody"></tbody></table></div><div class="prototype-note"><span>ⓘ</span><div><b>Analytics note</b><p>Ye reports sirf saved exam marks aur attendance records par based hain. Jis exam ya attendance ka record enter nahi hua, usay software estimate nahi karta. Weak result list academic review ke liye hai, student par final judgement nahi.</p></div></div></article>
+      </section>
+
+      <section class="page-content hidden" id="timetablePage">
+        <div class="page-intro"><div><span class="welcome-tag">ACADEMIC SCHEDULING</span><h2>Class Timetable</h2><p>Har class ka weekly schedule banayein aur teacher/class timing conflicts se bachein.</p></div><div class="idcard-actions"><button class="secondary-button" id="printTimetableBtn">Print Timetable</button><button class="secondary-button" id="exportTimetableBtn">Export CSV</button></div></div>
+        <div class="fee-summary"><div class="fee-stat"><small>TOTAL PERIODS</small><b id="timetableCount">0</b></div><div class="fee-stat"><small>ACTIVE TEACHERS</small><b id="timetableTeacherCount">0</b></div><div class="fee-stat"><small>CLASSES SCHEDULED</small><b id="timetableClassCount">0</b></div><div class="fee-stat"><small>SELECTED CAMPUS</small><b id="timetableCampusLabel">All Campuses</b></div></div>
+        <article class="panel fee-entry-panel"><div class="panel-heading"><div><h3>1. Add Period / Lesson</h3><p>Teacher list Staff module ke active teaching staff se aayegi.</p></div><span class="readiness-badge">WEEKLY SCHEDULE</span></div>
+          <form id="timetableForm" class="fee-form">
+            <label>Campus *<select id="ttCampus" required><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option></select></label>
+            <label>Class *<select id="ttClass" required><option value="">Select class</option><option>Nursery</option><option>KG</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option></select></label>
+            <label>Day *<select id="ttDay" required><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option></select></label>
+            <label>Period No. *<input id="ttPeriod" type="number" min="1" max="12" required placeholder="e.g. 1"></label>
+            <label>Start Time *<input id="ttStart" type="time" required></label><label>End Time *<input id="ttEnd" type="time" required></label>
+            <label>Subject *<input id="ttSubject" required maxlength="60" placeholder="e.g. Mathematics"></label>
+            <label>Teacher *<select id="ttTeacher" required><option value="">Select active teacher</option></select></label>
+            <label>Room / Class No.<input id="ttRoom" maxlength="40" placeholder="e.g. Room 3"></label>
+            <label class="span-2">Note<input id="ttNote" maxlength="120" placeholder="Optional"></label>
+            <div class="fee-form-actions"><button type="reset" class="secondary-button" id="resetTimetableBtn">Clear Form</button><button type="submit" class="primary-button">Save Period</button></div>
+          </form>
+        </article>
+        <article class="panel fee-register-panel"><div class="table-toolbar"><div><h3>2. Weekly Timetable Register</h3><p>Campus aur class select karke schedule dekhein.</p></div><div class="fee-filters"><label>Campus<select id="ttFilterCampus"><option value="all">All Campuses</option><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option></select></label><label>Class<select id="ttFilterClass"><option value="all">All Classes</option><option>Nursery</option><option>KG</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option></select></label></div></div>
+          <div class="table-wrap"><table><thead><tr><th>DAY</th><th>PERIOD</th><th>TIME</th><th>CLASS / CAMPUS</th><th>SUBJECT</th><th>TEACHER</th><th>ROOM</th><th>ACTION</th></tr></thead><tbody id="timetableTableBody"></tbody></table></div><div class="empty-state" id="timetableEmpty"><h3>No timetable periods yet</h3><p>Upar form se pehla period add karein.</p></div>
+        </article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Timetable note</b><p>System same class ya same teacher ko aik hi day aur period mein dobara assign nahi hone deta. Timetable isi browser/computer mein save hota hai aur backup/restore mein include hai. Bell schedule aur holidays abhi automatic manage nahi hote.</p></div></div>
+      </section>
+
+      <section class="page-content hidden" id="parentPortalPage">
+        <div class="page-intro"><div><span class="welcome-tag">FAMILY & SCHOOL CONNECTION</span><h2>Parent Communication Center</h2><p>Parents ke liye notices, student summary aur WhatsApp contact preparation.</p></div><button class="primary-button" id="printParentNoticesBtn">Print notices</button></div>
+        <div class="analytics-kpis director-kpi-grid">
+          <article class="director-kpi kpi-purple"><div class="kpi-label">PUBLISHED NOTICES</div><strong id="parentNoticeCount">0</strong><small>Saved announcements</small></article>
+          <article class="director-kpi kpi-green"><div class="kpi-label">STUDENTS WITH GUARDIAN PHONE</div><strong id="parentPhoneCount">0</strong><small>Contact details available</small></article>
+          <article class="director-kpi kpi-orange"><div class="kpi-label">SELECTED CAMPUS</div><strong id="parentCampusCount">All</strong><small>Current campus filter</small></article>
+        </div>
+        <div class="director-grid-two analytics-grid">
+          <article class="panel"><div class="panel-heading"><div><h3>Create school announcement</h3><p>Notice ko campus aur audience ke mutabiq save karein.</p></div></div>
+            <form id="parentNoticeForm" class="fee-form">
+              <label class="span-2">Notice title<input id="parentNoticeTitle" required maxlength="100" placeholder="e.g. Parent-teacher meeting"></label>
+              <label>Audience<select id="parentNoticeAudience"><option value="all">All parents</option><option value="boys">Boys Campus parents</option><option value="girls">Girls Campus parents</option><option value="class">Specific class</option></select></label>
+              <label id="parentNoticeClassWrap" class="hidden">Class<select id="parentNoticeClass"><option>Nursery</option><option>KG</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option></select></label>
+              <label>Publish date<input id="parentNoticeDate" type="date" required></label>
+              <label class="span-2">Message<textarea id="parentNoticeMessage" rows="4" required maxlength="1200" placeholder="Write the announcement for parents..."></textarea></label>
+              <div class="fee-form-actions"><button class="secondary-button" type="reset">Clear</button><button class="primary-button" type="submit">Publish notice</button></div>
+            </form>
+          </article>
+          <article class="panel"><div class="panel-heading"><div><h3>Parent / student preview</h3><p>Admin yahan parent ko dikhne wali available summary preview kar sakta hai.</p></div></div>
+            <label class="parent-select-label">Select student<select id="parentStudentSelect"><option value="">Select a student</option></select></label>
+            <div id="parentStudentPreview" class="parent-student-preview"><div class="empty-state"><p>Student select karein to guardian contact, fee balance, attendance aur latest result summary yahan nazar aayegi.</p></div></div>
+          </article>
+        </div>
+        <article class="panel parent-notices-panel"><div class="panel-heading"><div><h3>Published notices</h3><p>Saved notices ko WhatsApp par share karne ke liye parent contact list.</p></div><input id="parentNoticeSearch" class="search-input" placeholder="Search notices..."></div><div id="parentNoticeList" class="parent-notice-list"></div></article>
+        <div class="prototype-note"><span>ⓘ</span><div><b>Important: local communication center</b><p>Ye version school office ke liye notices aur parent summaries prepare karta hai. Abhi parents ke apne mobile se secure login, automatic push notifications ya cloud sync available nahi. WhatsApp links sirf message prepare karte hain; sending aap manually confirm karenge. Real parent access se pehle secure online database, parent accounts aur permissions zaroori hain.</p></div></div>
+      </section>
+      <section class="page-content hidden" id="reportsPage">
+        <div class="page-intro"><div><span class="welcome-tag">DIRECTOR REPORTING CENTER</span><h2>One-Click Monthly Reports</h2><p>School ke academic, attendance, fee aur finance records ka combined monthly overview.</p></div><button class="primary-button" id="generateMonthlyReportBtn">Generate & Print PDF</button></div>
+        <article class="panel"><div class="fee-form"><label>Report month<input type="month" id="monthlyReportMonth"></label><label>Campus<select id="monthlyReportCampus"><option value="all">All Campuses</option><option value="boys">Boys Campus</option><option value="girls">Girls Campus</option></select></label><div class="fee-form-actions"><button class="secondary-button" id="previewMonthlyReportBtn" type="button">Refresh Preview</button></div></div></article>
+        <div class="analytics-kpis director-kpi-grid" id="monthlyReportKpis"></div>
+        <div class="director-grid-two analytics-grid"><article class="panel"><div class="panel-heading"><div><h3>Report sections</h3><p>Generated report mein ye summaries shamil hongi.</p></div></div><ul class="report-section-list"><li>Student strength & campus breakdown</li><li>Student and staff attendance</li><li>Fee demand, collection & outstanding balance</li><li>Examination performance</li><li>Expenses and payroll summary</li><li>Gate entry activity</li></ul></article><article class="panel"><div class="panel-heading"><div><h3>How to save as PDF</h3></div></div><p>Generate & Print PDF par click karein. Print dialog mein destination <b>Save as PDF</b> select karein, paper size A4 rakhein aur Save press karein.</p><p class="muted">Report sirf is browser mein saved records par based hai. Missing records ko zero/blank hi dikhaya jayega; software koi data khud se estimate nahi karega.</p></article></div>
+      </section>
+      <section class="page-content hidden" id="settingsPage">
+        <div class="role-preview-warning">Aap Supabase ke authenticated account se signed in hain. Cloud database access active account aur Supabase Row Level Security policies se control hota hai.</div>
+        <div class="page-intro"><div><span class="welcome-tag">SCHOOL CONFIGURATION</span><h2>System Settings</h2><p>School profile, campuses, academic session, grading aur data backup manage karein.</p></div><button class="primary-button" id="saveSettingsBtn">Save Settings</button></div>
+        <form id="settingsForm">
+          <article class="panel settings-panel"><div class="panel-heading"><div><h3>1. School Profile & Branding</h3><p>Ye details school documents aur system identity ke liye save hongi.</p></div><span class="readiness-badge">SCHOOL PROFILE</span></div>
+            <div class="form-grid"><label>School name *<input id="setSchoolName" required maxlength="120" value="Swat Model School"></label><label>Short name<input id="setShortName" maxlength="30" value="SMS"></label><label>School address<input id="setAddress" maxlength="220" placeholder="Darmai, Swat"></label><label>Official phone<input id="setPhone" maxlength="40" placeholder="School contact number"></label><label>Email<input id="setEmail" type="email" maxlength="120" placeholder="school@example.com"></label><label>Principal / Director name<input id="setHeadName" maxlength="100" placeholder="Principal / Director"></label><label>School logo (PNG/JPG)<input id="setLogo" type="file" accept="image/png,image/jpeg"><small>Optional; image up to 300 KB. Stored in this browser only.</small></label><div class="photo-preview-wrap"><img id="settingsLogoPreview" class="student-photo-preview" alt="School logo preview"><span id="settingsLogoText">No logo uploaded</span><button type="button" class="secondary-button" id="removeSettingsLogo">Remove logo</button></div></div>
+          </article>
+          <article class="panel settings-panel"><div class="panel-heading"><div><h3>2. Campus Information</h3><p>Boys aur Girls campus ki contact details alag save karein.</p></div></div><div class="form-grid"><label>Boys campus display name<input id="setBoysName" value="Boys Campus" maxlength="80"></label><label>Boys campus phone<input id="setBoysPhone" maxlength="40"></label><label>Girls campus display name<input id="setGirlsName" value="Girls Campus" maxlength="80"></label><label>Girls campus phone<input id="setGirlsPhone" maxlength="40"></label></div></article>
+          <article class="panel settings-panel"><div class="panel-heading"><div><h3>3. Academic Settings</h3><p>Session aur result grading ke default settings.</p></div></div><div class="form-grid"><label>Academic session<input id="setAcademicSession" maxlength="30" placeholder="2026–2027"></label><label>Default passing percentage (%)<input id="setPassPercent" type="number" min="1" max="100" value="33" required></label><label>Working days<select id="setWorkingDays"><option value="Monday-Saturday">Monday to Saturday</option><option value="Monday-Friday">Monday to Friday</option><option value="Sunday-Thursday">Sunday to Thursday</option></select></label><label>Currency<select id="setCurrency"><option value="PKR">PKR – Pakistani Rupee</option></select></label></div><p class="muted">Note: Passing percentage yahan default preference ke taur par save hoti hai. Existing exams ki individually saved passing percentage automatically change nahi hogi.</p></article>
+          <div class="form-actions"><button type="submit" class="primary-button">Save School Settings</button></div>
+        </form>
+        <article class="panel settings-panel"><div class="panel-heading"><div><h3>4. Backup & Restore</h3><p>Apne school records ki regular backup copy rakhein.</p></div><span class="readiness-badge">DATA SAFETY</span></div><div class="backup-actions"><button type="button" class="secondary-button" id="settingsDownloadBackup">Download Full Backup (JSON)</button><button type="button" class="secondary-button" id="settingsRestoreBackup">Restore Backup</button><input type="file" id="settingsRestoreFile" accept="application/json,.json" hidden></div><p class="muted">Restore karne se current records replace honge. Restore se pehle current backup zaroor download karein.</p></article>
+        <article class="panel settings-panel" id="cloudMigrationPanel"><div class="panel-heading"><div><h3>5. Cloud Data Migration – Phase 22</h3><p>Is computer ke saved school records ka secure cloud snapshot banayein.</p></div><span class="readiness-badge">CLOUD MIGRATION</span></div>
+          <div class="prototype-note"><span>ⓘ</span><div><b>Safe first migration step</b><p>Ye action current browser records ko Supabase mein aik protected JSON snapshot ke taur par upload karega. Ye abhi live multi-device sync nahi hai aur na hi har module ko cloud database tables se connect karta hai. Cloud snapshot har upload par replace hoga. Upload se pehle JSON backup download karein.</p></div></div>
+          <div class="backup-actions"><button type="button" class="secondary-button" id="cloudMigrationPreviewBtn">Preview Local Data Counts</button><button type="button" class="primary-button" id="uploadCloudSnapshotBtn">Upload Current Data to Cloud</button></div>
+          <div id="cloudMigrationCounts" class="muted" style="margin-top:12px">Preview not generated yet.</div><p id="cloudMigrationStatus" class="muted" role="status" aria-live="polite">Cloud migration has not been run from this browser.</p>
+        </article>
+        <article class="panel settings-panel" id="cloudSyncPanel">
+          <div class="panel-heading"><div><h3>6. Cloud Data Sync – Phase 24</h3><p>Local browser data ko Supabase cloud tables mein bhejein ya cloud se is device par laayein.</p></div><span class="readiness-badge">MANUAL CLOUD SYNC</span></div>
+          <div class="prototype-note"><span>ⓘ</span><div><b>Important – manual sync only</b><p>Ye buttons poore module ka data ek cloud record mein save/load karte hain. Ye automatic live sync nahi hai. Upload cloud par maujood module data ko replace karega; Download is browser ka local module data replace karega. Har sync se pehle JSON backup download karein. Ek waqt mein sirf aik device par records edit karein.</p></div></div>
+          <div class="backup-actions"><button type="button" class="secondary-button" id="cloudPullBtn">Download Cloud Data to This Device</button><button type="button" class="primary-button" id="cloudPushBtn">Upload This Device Data to Cloud</button></div>
+          <p id="cloudSyncStatus" class="muted" role="status" aria-live="polite">Cloud sync abhi run nahi hui.</p>
+          <p class="muted">Admin aur Director dono school operational data sync kar sakte hain. School profile settings ka cloud sync sirf Director account ke liye hai. User passwords kabhi sync nahi hote.</p>
+        </article>
+        <article class="panel settings-panel" id="userAccessPanel"><div class="panel-heading"><div><h3>7. User Directory & Permission Plan</h3><p>Admin aur Director accounts ki planning aur role access register.</p></div><span class="readiness-badge">PHASE 20</span></div>
+          <div class="prototype-note"><span>ⓘ</span><div><b>Local planning register only</b><p>Yahan account details aur permission templates save hongi. Ye login create nahi karta, password store nahi karta aur security enforce nahi karta. Real accounts Phase 21 ke secure cloud authentication mein banenge.</p></div></div>
+          <form id="accessUserForm" class="form-grid"><label>Full name *<input id="accessFullName" required maxlength="100" placeholder="e.g. School Administrator"></label><label>Username / email *<input id="accessUsername" required maxlength="120" placeholder="admin@school.example"></label><label>Role<select id="accessRole"><option value="admin">Administrator</option><option value="director">Director</option></select></label><label>Account status<select id="accessStatus"><option value="planned">Planned</option><option value="active">Active (cloud setup pending)</option><option value="inactive">Inactive</option></select></label><label class="span-2">Notes<input id="accessNotes" maxlength="180" placeholder="Account owner / responsibility"></label><div class="fee-form-actions"><button class="primary-button" type="submit">Add to User Directory</button></div></form>
+          <div class="panel-heading" style="margin-top:20px"><div><h3>Account Directory</h3><p>Names and roles only — no passwords.</p></div><span class="readiness-badge" id="accessUserCount">0 ACCOUNTS</span></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Username / Email</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody id="accessUserRows"><tr><td colspan="5" class="muted">No accounts added yet.</td></tr></tbody></table></div>
+          <div class="panel-heading" style="margin-top:22px"><div><h3>Role Permission Matrix</h3><p>Proposed access for the future cloud login.</p></div></div><div class="table-wrap"><table><thead><tr><th>Module</th><th>Administrator</th><th>Director</th></tr></thead><tbody id="permissionMatrixRows"></tbody></table></div><p class="muted">Director: full access. Administrator: daily school operations; System Settings and account permissions remain Director-only. These are planning settings until server-side enforcement is implemented.</p>
+        </article>
+        <article class="panel settings-panel"><div class="panel-heading"><div><h3>8. Security & Implementation Status</h3><p>Security ke bare mein clear information.</p></div></div><div class="prototype-note"><span>ⓘ</span><div><b>Current cloud security & sync status</b><p>Supabase email/password login active hai. Active Admin aur Director profiles ke liye module-table RLS policies configured hain; school settings ka cloud access Director-only hai. Phase 24 manual upload/download sync deta hai, automatic live sync nahi. Local browser data aur cloud data sync karne ke liye Settings mein Cloud Data Sync controls use karein.</p></div></div><div class="settings-audit"><b>Settings change history</b><div id="settingsAuditList" class="muted">No settings changes recorded yet.</div></div></article>
+      </section>
+      <section class="page-content hidden" id="placeholderPage">
+        <div class="page-intro"><div><span class="welcome-tag">COMING IN NEXT PHASES</span><h2 id="placeholderTitle">Module</h2><p id="placeholderDescription">This module will be developed after the student register.</p></div></div>
+        <article class="panel module-placeholder"><div class="module-illustration">✦</div><h3>This module is planned</h3><p>We will build each part in a safe order and test it before adding official school data.</p><button class="secondary-button" data-page="dashboard">Return to dashboard</button></article>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="studentModal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header"><div><span class="welcome-tag">NEW RECORD</span><h2 id="modalTitle">Add student</h2><p>Enter the basic student details below.</p></div><button class="close-button" id="closeModal" aria-label="Close">×</button></div>
+      <form id="studentForm">
+        <div class="form-grid">
+          <label>Student full name *<input type="text" id="studentName" required maxlength="100" placeholder="e.g. Ahmad Khan"></label>
+          <label>Student ID *<input type="text" id="studentId" required maxlength="30" placeholder="Auto-generated Student ID"></label>
+          <label>Class *<select id="studentClass" required><option value="">Select class</option><option>Nursery</option><option>Prep</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option></select></label>
+          <label>Campus *<select id="studentCampus" required><option value="girls">Girls Campus</option><option value="boys">Boys Campus</option></select></label>
+          <label>Father / Guardian name *<input type="text" id="guardianName" required maxlength="100" placeholder="Parent / guardian"></label>
+          <label>Guardian phone<input type="text" id="guardianPhone" maxlength="30" placeholder="03xx-xxxxxxx"></label>
+          <label>Gender<select id="studentGender"><option value="">Select gender</option><option>Male</option><option>Female</option></select></label>
+          <label>Date of birth<input type="date" id="studentDob"></label>
+          <label>Admission date<input type="date" id="admissionDate"></label>
+          <label>Home address<input type="text" id="studentAddress" maxlength="220" placeholder="Village / area"></label>
+          <label class="photo-upload-label">Student photo<input type="file" id="studentPhoto" accept="image/*"><small>Optional. Use a clear JPG or PNG photo.</small></label>
+          <div class="photo-preview-wrap"><img id="studentPhotoPreview" alt="Student photo preview" class="student-photo-preview"><span id="photoPreviewText">No photo selected</span></div>
+        </div>
+        <div class="form-actions"><button type="button" class="secondary-button" id="cancelModal">Cancel</button><button type="submit" class="primary-button">Save student</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="app.js"></script>
+</body>
+</html>
